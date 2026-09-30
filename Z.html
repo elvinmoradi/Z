@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>رزرو تبلیغات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Estedad:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;overflow-x:hidden;min-height:100vh;width:100%;max-width:none;background:#0b120f;color:#e8e4d6;font-family:'Estedad',Tahoma,Arial,sans-serif}
+.mono{font-family:ui-monospace,'JetBrains Mono',Consolas,monospace}
+.wrap{width:100vw;max-width:none;min-width:0;margin:0;padding:18px 15px 15px}
+
+/* --- بلیت بالای صفحه (به‌جای هدر گرادیانی معمول) --- */
+.hero{background:#2f6b46;color:#f3ecd9;padding:24px 20px 30px;position:relative;margin-bottom:26px}
+.hero h1{margin:0 0 6px;font-size:23px;font-weight:900}
+.hero p{margin:0;font-size:12.5px;opacity:.85}
+.hero::before{content:"";position:absolute;left:16px;right:16px;bottom:14px;border-top:2px dashed #f3ecd977}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:13px;background:
+  linear-gradient(135deg,#0b120f 50%,transparent 50%) 0 0/13px 13px repeat-x,
+  linear-gradient(-135deg,#0b120f 50%,transparent 50%) 0 0/13px 13px repeat-x;
+  background-position:0 0,7px 0}
+
+.card{background:#10160f;border:1px dashed #2f6b4680;border-radius:10px;padding:18px;margin-bottom:14px}
+.title{color:#8fbf9f;font-weight:bold;font-size:16px;margin-bottom:13px;display:flex;align-items:center;gap:7px}
+.info{color:#9aa39c;font-size:13px;line-height:2}
+
+/* --- کوپن پرداخت: طرح بلیت با بریدگی دایره‌ای دو طرف --- */
+.price{background:#f3ecd9;color:#1c2b20;border-radius:9px;padding:14px 16px;margin-top:12px;position:relative}
+.price::before,.price::after{content:"";position:absolute;top:50%;transform:translateY(-50%);width:16px;height:16px;background:#10160f;border-radius:50%}
+.price::before{left:-9px}.price::after{right:-9px}
+.price strong{color:#2f6b46;font-size:17px}
+.price .info{color:#5a6459}
+.code{direction:ltr;text-align:center;background:#e8dfc4;color:#1c2b20;border-radius:6px;padding:9px;margin-top:8px;word-break:break-all;font-family:ui-monospace,'JetBrains Mono',Consolas,monospace;font-size:13px;letter-spacing:.5px}
+.copy{width:100%;margin-top:8px;padding:9px;border:1px dashed #2f6b46;border-radius:6px;background:transparent;color:#2f6b46;font-weight:bold;transition:.15s;cursor:pointer}
+.copy:active{transform:scale(.97);background:#2f6b4614}
+
+.days{display:flex;flex-direction:column;gap:10px}
+.day{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#f3ecd9;color:#1c2b20;border-radius:8px;padding:13px 16px;cursor:pointer;position:relative;transition:transform .15s}
+.day::before,.day::after{content:"";position:absolute;top:50%;transform:translateY(-50%);width:14px;height:14px;background:#0b120f;border-radius:50%}
+.day::before{left:-8px}.day::after{right:-8px}
+.day:hover:not(.disabled){transform:translateX(-3px)}
+.day.selected{outline:2px solid #2f6b46;outline-offset:-2px}
+.day.disabled{cursor:not-allowed;opacity:.55}
+.dayname{font-weight:bold;margin-bottom:4px}
+.date{font-size:11px;color:#5a6459;font-family:ui-monospace,'JetBrains Mono',Consolas,monospace}
+.badge{font-size:10.5px;padding:6px 9px;border-radius:5px;white-space:nowrap;font-weight:bold}
+.free{background:#2f6b46;color:#f3ecd9}.waiting{background:#a3711e;color:#f3ecd9}.booked{background:#9c3b31;color:#f3ecd9}
+.badge.free::before{content:"● "}
+
+label{display:block;color:#9aa39c;font-size:12.5px;margin:0 0 6px}
+input,select{width:100%;padding:13px;margin:0 0 14px;background:#161c15;border:1px solid #2c352a;border-radius:8px;color:#e8e4d6;font-family:inherit;outline:none;transition:.15s}
+input:focus,select:focus{border-color:#2f6b46;box-shadow:0 0 0 3px #2f6b4626}
+input[type=file]{padding:10px;font-size:12px}
+.notice{background:#1c1710;border:1px dashed #5a4520;border-radius:8px;padding:12px;color:#c9bd9e;font-size:12px;line-height:1.9;margin-bottom:14px}
+.mainbtn{width:100%;padding:15px;border:0;border-radius:8px;background:#2f6b46;color:#f3ecd9;font-size:15px;font-weight:bold;cursor:pointer;transition:transform .1s}
+.mainbtn:active{transform:scale(.97) translateY(1px)}
+.mainbtn:disabled{opacity:.5;cursor:not-allowed}
+.support{display:block;text-align:center;text-decoration:none;color:#f3ecd9;background:#2f6b46;padding:14px;border-radius:8px;font-weight:bold;transition:transform .1s}
+.support:active{transform:scale(.97)}
+.selectedInfo{display:none;background:#1c2e1e;border:1px dashed #2f6b46;color:#a9d4b5;border-radius:8px;padding:11px;margin:-4px 0 14px;font-size:12px}
+.weekNotice{background:#1c1710;border:1px dashed #5a4520;color:#d4b87c;border-radius:8px;padding:11px;margin-bottom:12px;font-size:12px}
+.skeleton{background:#161c15;border:1px dashed #2c352a;border-radius:8px;height:56px;position:relative;overflow:hidden}
+.skeleton::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,#ffffff0d,transparent);animation:shimmer 1.3s infinite}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c2418;border:1px solid #2f6b46;color:#e8dfc4;padding:12px 20px;border-radius:8px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{text-align:center;color:#4a5148;font-size:11px;padding:8px 0 25px;font-family:ui-monospace,'JetBrains Mono',Consolas,monospace}
+
+@keyframes stampIn{from{opacity:0;transform:scale(.94) rotate(-1deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes shimmer{100%{transform:translateX(100%)}}
+.hero{animation:stampIn .45s cubic-bezier(.2,.9,.3,1.3) both}
+.card{animation:stampIn .4s cubic-bezier(.2,.9,.3,1.3) both}
+.card:nth-of-type(2){animation-delay:.05s}.card:nth-of-type(3){animation-delay:.1s}.card:nth-of-type(4){animation-delay:.15s}
+
+@media(max-width:500px){.hero h1{font-size:20px}.card{padding:15px}.day{padding:12px 14px}}
+.hp-field{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+</style>
+
+<style id="mobile-full-width-fix">
+html, body {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: hidden !important;
+}
+body {
+  display: block !important;
+}
+.wrap {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 18px 15px 15px !important;
+}
+.hero, .card, footer {
+  width: 100% !important;
+  max-width: none !important;
+}
+@media (max-width: 700px) {
+  .wrap {
+    width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+<section class="hero">
+<h1>🎫 رزرو تبلیغات</h1>
+<p>انتخاب نوبت، پرداخت و ارسال رسید</p>
+</section>
+
+<section class="card">
+<div class="title">📢 جزئیات تبلیغات</div>
+<div class="info">
+تبلیغات به صورت <b style="color:#8fbf9f">دائمی</b> انجام می‌شود.
+<br>پس از ارسال رسید، درخواست شما توسط مدیریت بررسی خواهد شد.
+</div>
+
+<div class="price">
+<strong>🪙 ۵٬۰۰۰ سکه</strong>
+<div class="info">شناسه جهت پرداخت:</div>
+<div class="code">krmwaqhoxz</div>
+<button class="copy" onclick="copyText('krmwaqhoxz')">📋 کپی شناسه</button>
+</div>
+
+<div class="price">
+<strong>💵 ۵۰٬۰۰۰ تومان</strong>
+<div class="info">شماره کارت جهت پرداخت:</div>
+<div class="code">5022291627470055</div>
+<button class="copy" onclick="copyText('5022291627470055')">📋 کپی شماره کارت</button>
+</div>
+</section>
+
+<section class="card">
+<div class="title">📅 وضعیت روزها</div>
+<div id="weekNotice" class="weekNotice" style="display:none">📌 این هفته تکمیل است — روزهای زیر برای هفته بعد هستند</div>
+<div class="days" id="days">
+<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+</div>
+</section>
+
+<section class="card">
+<div class="title">👤 اطلاعات رزرو</div>
+
+<div id="selectedInfo" class="selectedInfo"></div>
+
+<label>نام</label>
+<input id="name" type="text" placeholder="⚚𝕞𝕒𝕝𝕖𝕜⚚">
+
+<label>آیدی روبیکا</label>
+<input id="rubika" type="text" placeholder="@example">
+
+<label>روش پرداخت</label>
+<select id="payment">
+<option value="coins">🪙 ۵٬۰۰۰ سکه</option>
+<option value="cash">💵 ۵۰٬۰۰۰ تومان</option>
+</select>
+
+<label>تصویر رسید پرداخت</label>
+<input id="receipt" type="file" accept="image/jpeg,image/png,image/webp">
+
+<!-- Honeypot: فیلد مخفی که فقط ربات‌ها پرش می‌کنن -->
+<input class="hp-field" type="text" id="hp_field" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+<div class="notice">
+⚠️ پس از ثبت درخواست، روز انتخابی در وضعیت
+<b style="color:#ffd46b">«در انتظار تأیید»</b>
+قرار می‌گیرد و تا تصمیم مدیریت برای شخص دیگری قابل رزرو نیست.
+</div>
+
+<button class="mainbtn" id="submitBtn" onclick="submitBooking()">ثبت درخواست رزرو</button>
+<div id="debugErr" style="display:none;margin-top:10px;background:#2a1010;border:1px solid #641d1d;border-radius:12px;padding:12px;font-size:11px;color:#ff9b9b;direction:ltr;text-align:left;word-break:break-all;user-select:all"></div>
+</section>
+
+<section class="card">
+<div class="title">💬 ارتباط با پشتیبانی</div>
+<a class="support" href="https://rubika.ir/S__a__M__666" target="_blank">
+ارتباط با پشتیبانی<br>@S__a__M__666
+</a>
+</section>
+
+<footer>سیستم رزرو تبلیغات</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = "https://dtgahjamlddfqpfyaaau.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_jYoEQWLWRD6wh2Pl69tkWw_ZRIC5YW4"; // Settings > API > anon public key
+
+if(typeof supabase==="undefined"){
+  document.getElementById("days").innerHTML='<div class="empty" style="color:#ff8b8b;text-align:center;padding:20px">⚠️ اتصال به سرویس برقرار نشد. اگه بدون VPN هستی، VPN رو روشن کن و صفحه رو رفرش کن.</div>';
+  throw new Error("supabase-js failed to load");
+}
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const daysEl=document.getElementById("days");
+const weekNoticeEl=document.getElementById("weekNotice");
+let selectedDate=null;
+let dayStatusMap={};
+let currentWeekOffset=0;
+
+function getDeviceId(){
+  let id=localStorage.getItem("deviceId");
+  if(!id){
+    id=(crypto.randomUUID?crypto.randomUUID():"dev-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+    localStorage.setItem("deviceId",id);
+  }
+  return id;
+}
+const DEVICE_ID=getDeviceId();
+const PAGE_LOADED_AT=Date.now();
+
+async function checkDeviceBanned(){
+  const {data,error}=await sb.from("banned_devices").select("device_id").eq("device_id",DEVICE_ID).maybeSingle();
+  if(error){console.error(error);return false;}
+  return !!data;
+}
+
+async function initSite(){
+  const banned=await checkDeviceBanned();
+  if(banned){
+    document.body.innerHTML='<div style="max-width:500px;margin:80px auto;text-align:center;padding:20px;color:#ff9b9b;font-family:inherit">'+
+      '<div style="font-size:40px;margin-bottom:14px">🚫</div>'+
+      '<div style="font-size:16px;font-weight:bold;margin-bottom:8px">دسترسی شما به این سایت مسدود شده است</div>'+
+      '<div style="font-size:13px;color:#999">برای پیگیری با پشتیبانی در ارتباط باشید.</div>'+
+      '</div>';
+    return;
+  }
+  loadStatus();
+}
+
+function formatDate(d){
+  return new Intl.DateTimeFormat("fa-IR",{weekday:"long",day:"numeric",month:"long"}).format(d);
+}
+function isoDate(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h=setTimeout(()=>t.classList.remove("show"),2600);
+}
+
+async function fetchWeek(weekOffset){
+  const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()+weekOffset*7);
+  const end=new Date(start);end.setDate(end.getDate()+6);
+  const {data,error}=await sb
+    .from("booking_status")
+    .select("date,status")
+    .gte("date",isoDate(start))
+    .lte("date",isoDate(end));
+  const map={};
+  if(!error && data){
+    data.forEach(r=>{map[r.date]=r.status;});
+  }else if(error){
+    console.error(error);
+  }
+  return map;
+}
+
+function weekIsFullyBooked(map,weekOffset){
+  for(let i=0;i<7;i++){
+    const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+weekOffset*7+i);
+    if(!map[isoDate(d)])return false; // یعنی این روز آزاده
+  }
+  return true;
+}
+
+async function loadStatus(){
+  let map=await fetchWeek(0);
+  let offset=0;
+  if(weekIsFullyBooked(map,0)){
+    offset=1;
+    map=await fetchWeek(1);
+  }
+  dayStatusMap=map;
+  currentWeekOffset=offset;
+  weekNoticeEl.style.display=offset===1?"block":"none";
+  renderDays();
+}
+
+function renderDays(){
+  daysEl.innerHTML="";
+  for(let i=0;i<7;i++){
+    const d=new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate()+currentWeekOffset*7+i);
+    const key=isoDate(d);
+    const status=dayStatusMap[key]||"free";
+
+    const el=document.createElement("div");
+    el.className="day";
+    el.style.animationDelay=(i*0.06)+"s";
+    if(status!=="free")el.classList.add("disabled");
+
+    const label=currentWeekOffset===0
+      ?(i===0?"امروز":i===1?"فردا":formatDate(d))
+      :formatDate(d);
+    const badge=status==="free"
+      ?'<span class="badge free">آزاد</span>'
+      :status==="pending"
+      ?'<span class="badge waiting">● در انتظار تأیید</span>'
+      :'<span class="badge booked">● رزرو شده</span>';
+
+    el.innerHTML='<div><div class="dayname">'+label+'</div><div class="date">'+key+'</div></div>'+badge;
+
+    if(status==="free"){
+      el.onclick=()=>selectDay(el,key,label);
+    }
+    daysEl.appendChild(el);
+  }
+}
+
+function selectDay(el,date,label){
+  document.querySelectorAll(".day").forEach(x=>x.classList.remove("selected"));
+  el.classList.add("selected");
+  selectedDate=date;
+  const box=document.getElementById("selectedInfo");
+  box.style.display="block";
+  const weekTag=currentWeekOffset===1?" (هفته بعد)":"";
+  box.textContent="✅ نوبت انتخاب‌شده: "+label+weekTag+" — "+date;
+}
+
+function copyText(text){
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>toast("کپی شد ✅"));
+  }else{
+    toast(text);
+  }
+}
+
+function todayKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function getDeviceSubmitCount(){
+  try{
+    const raw=JSON.parse(localStorage.getItem("adBookingCount")||"{}");
+    return raw.date===todayKey()?(raw.count||0):0;
+  }catch(_){return 0;}
+}
+function bumpDeviceSubmitCount(){
+  try{
+    localStorage.setItem("adBookingCount",JSON.stringify({date:todayKey(),count:getDeviceSubmitCount()+1}));
+  }catch(_){}
+}
+
+async function submitBooking(){
+  if(!selectedDate){toast("لطفاً ابتدا یک روز آزاد را انتخاب کنید.");return;}
+  if(getDeviceSubmitCount()>=3){
+    toast("شما امروز از این دستگاه به حداکثر تعداد درخواست (۳ مورد) رسیده‌اید.");
+    return;
+  }
+
+  // Honeypot: اگه این فیلد مخفی پر شده باشه یعنی رباته
+  const hp=document.getElementById("hp_field").value;
+  if(hp){toast("خطا در ثبت درخواست.");return;}
+
+  // چک زمانی: اگه فرم خیلی سریع (زیر ۳ ثانیه) پر و ارسال بشه، احتمال زیاد رباته
+  if(Date.now()-PAGE_LOADED_AT<3000){
+    toast("لطفاً چند ثانیه صبر کنید و دوباره تلاش کنید.");
+    return;
+  }
+
+  const name=document.getElementById("name").value.trim();
+  const rubika=document.getElementById("rubika").value.trim();
+  const payment=document.getElementById("payment").value;
+  const file=document.getElementById("receipt").files[0];
+  if(!name){toast("لطفاً نام را وارد کنید.");return;}
+  if(!rubika){toast("لطفاً آیدی روبیکا را وارد کنید.");return;}
+  if(!file){toast("لطفاً تصویر رسید را انتخاب کنید.");return;}
+  if(!file.type||!file.type.startsWith("image/")){toast("فقط ارسال فایل تصویر (عکس) مجاز است.");return;}
+
+  const btn=document.getElementById("submitBtn");
+  btn.disabled=true;btn.textContent="در حال ارسال...";
+
+  try{
+    const ext=file.name.split(".").pop();
+    const path=selectedDate+"-"+Date.now()+"."+ext;
+    const up=await sb.storage.from("receipts").upload(path,file,{upsert:false,contentType:file.type});
+    if(up.error)throw up.error;
+    const {data:pub}=sb.storage.from("receipts").getPublicUrl(path);
+
+    const ins=await sb.from("bookings").insert({
+      date:selectedDate,
+      name,
+      rubika_id:rubika,
+      payment_method:payment,
+      receipt_url:pub.publicUrl,
+      device_id:DEVICE_ID,
+      status:"pending"
+    });
+    if(ins.error)throw ins.error;
+
+    bumpDeviceSubmitCount();
+    toast("درخواست شما ثبت شد ✅ منتظر تأیید مدیریت بمانید.");
+    document.getElementById("name").value="";
+    document.getElementById("rubika").value="";
+    document.getElementById("receipt").value="";
+    document.getElementById("selectedInfo").style.display="none";
+    selectedDate=null;
+    await loadStatus();
+  }catch(e){
+    console.error(e);
+    const dbg=document.getElementById("debugErr");
+    if(e.message&&e.message.includes("BANNED")){
+      toast("امکان ثبت درخواست برای این آیدی وجود ندارد.");
+      dbg.style.display="none";
+    }else if(e.message&&e.message.includes("DAILY_LIMIT")){
+      toast("شما امروز به حداکثر تعداد درخواست (۳ مورد) رسیده‌اید. فردا دوباره تلاش کنید.");
+      dbg.style.display="none";
+    }else if(e.message&&e.message.includes("FULL")){
+      toast("این روز رزرو شد. لطفاً روز دیگری انتخاب کنید.");
+      dbg.style.display="none";
+      await loadStatus();
+    }else{
+      toast("خطا در ثبت درخواست. متن خطا پایین همین باکس هست، برای مشتی بفرست.");
+      let msg="";
+      try{ msg=JSON.stringify(e,Object.getOwnPropertyNames(e)); }catch(_){ msg=String(e); }
+      dbg.textContent=(e.message||"")+" | "+(e.code||"")+" | "+(e.details||"")+" | "+(e.hint||"")+" | raw: "+msg;
+      dbg.style.display="block";
+    }
+  }finally{
+    btn.disabled=false;btn.textContent="ثبت درخواست رزرو";
+  }
+}
+
+initSite();
+</script>
+</body>
+</html>
